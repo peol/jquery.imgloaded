@@ -47,9 +47,9 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="pi.imgloaded.js"></script>
 <script>
-$('#all img').imagesLoaded(true, function (e) {
+$('#all img').imagesLoaded(function (e) {
 	$(this).parent().siblings('span.loaded').text('true');
-});
+}, true);
 
 $('#each img').imagesLoaded(function (e) {
 	$(this).parent().siblings('span.loaded').text('true');

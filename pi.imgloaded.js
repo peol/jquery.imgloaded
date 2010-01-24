@@ -11,13 +11,15 @@
 // Added support for calling the callback on each image load event
 // 
 
-$.fn.imagesLoaded = function() {
+// 'fireOne' argument is optional, if set, will invoke the callback once for every
+// image in the 'this' collection, thus making 'this' in the callback that element alone
+// If it's not used, the callback will be invoked once all the images in the collection has
+// been loaded. And 'this' will be the jQuery collection of the filtered 'img' elements.
+$.fn.imagesLoaded = function(callback, fireOne) {
   var
     args = arguments,
     elems = this.filter('img'),
-    elemsLen = elems.length - 1,
-    fireOne = args.length === 2,
-    callback = args[1] || args[0];
+    elemsLen = elems.length - 1;
 
   elems
     .bind('load', function(e) {
