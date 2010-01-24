@@ -1,6 +1,15 @@
-// Fork of Paul Irish's image loaded method http://gist.github.com/268257
+// $('img.photo',this).imagesLoaded(myFunction)
+// execute a callback when all images have loaded.
+// needed because .load() doesn't work on cached images
+
+// mit license. paul irish & andreé hansson. 2010.
+
+// callback function is passed the last image to load
+//   as an argument, and the collection as `this`
+
+
 // Added support for calling the callback on each image load event
-// It's all Paul's work, I just added tests and added that small feat.
+// 
 
 $.fn.imagesLoaded = function() {
   var
