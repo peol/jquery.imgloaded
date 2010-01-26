@@ -2,7 +2,7 @@
 // execute a callback when all images have loaded.
 // needed because .load() doesn't work on cached images
 
-// mit license. paul irish & andreé hansson. 2010.
+// mit license. paul irish & andrée hansson. 2010.
 
 // callback function is passed the last image to load
 //   as an argument, and the collection as `this`
@@ -30,8 +30,8 @@ $.event.special.imgload = {
 			}
 	},
 
-	teardown: function(namespaces) {
-		$.event.remove(this, 'load', hollaback);
+	teardown: function() {
+		$.event.remove(this, 'load');
 	},
 }
 
