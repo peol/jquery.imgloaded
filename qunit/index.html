@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>QUnit: Image Load</title>
+	<link rel="stylesheet" href="qunit/qunit.css" />
+	<style>img { display: block; }</style>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="../ahpi.imgload.js"></script>
+	<script src="qunit/qunit.js"></script>
+	<script>
+(function () {
+
+var img = new Image();
+img.onerror = img.onload = function () { runTests(); };
+img.src = 'cached.gif';
+
+function runTests() {
+
+	test("Image load event (Normal)", function () {
+
+		expect(2);
+
+		var $normal = $('#normal');
+		$normal.bind('load', function () { ok(true, "Load event fired"); });
+		$normal.unbind('load');
+		ok(true, "Load event unbound");
+	});
+
+	test("Image load event (Cached)", function () {
+
+		expect(2);
+
+		var $cached = $('#cached').attr('src', 'cached.gif');
+		$cached.bind('load', function () { ok(true, "Load event fired"); });
+		$cached.unbind('load');
+		ok(true, 'Load event unbound');
+	});
+
+	test("Image load event (Data URI)", function () {
+
+		expect(2);
+
+		var $datauri = $('#datauri');
+		$datauri.bind('error', function () { ok(true, "Data URI not supported"); });
+		$datauri.bind('load', function () { ok(true, "Load event fired"); });
+		$datauri.unbind('load');
+		ok(true, 'Load event unbound');
+	});
+}
+}());
+
+	</script>
+
+</head>
+
+<body>
+
+<p>
+	<img id="normal" src="normal.gif" />
+	<img id="cached" src="" />
+	<img id="datauri" src="data:image/gif;base64,R0lGODdhGwAPAIAAAP///wAAACwAAAAAGwAPAAACN4SPqcvtD08IaIKJrclab+pdlDR+FViK50qq7Wu2XOjGJreEOmrDteqhCUed1E6R8RWTkaYzUgAAOw==" />
+	<a href="../ahpi.imgload.js">ahpi.imgload.js Source</a>
+</p>
+
+<ol id="qunit-tests"></ol>
+</body>
+
+</html>
