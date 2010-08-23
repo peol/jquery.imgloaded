@@ -23,7 +23,7 @@
  */
 (function ($) {
 	$.event.special.load = {
-		add: function (hollaback, x, y) {
+		add: function (hollaback) {
 			if ( this.nodeType === 1 && this.tagName.toLowerCase() === 'img' && this.src !== '' ) {
 
 				// Image is already complete, fire the hollaback (fixes browser issues were cached
@@ -33,7 +33,7 @@
 				}
 
 				// Check if data URI images is supported, fire 'error' event if not
-				else if (this.readyState === 'uninitialized' && this.src.indexOf('data:') === 0) {
+				else if ( this.readyState === 'uninitialized' && this.src.indexOf('data:') === 0 ) {
 					$(this).trigger('error');
 				}
 			}
