@@ -3,7 +3,7 @@
  * Needed because some browsers does not trigger the event on cached images.
 
  * MIT License
- * Paul Irish		| @paul_irish | www.paulirish.com
+ * Paul Irish     | @paul_irish | www.paulirish.com
  * Andree Hansson | @peolanha   | www.andreehansson.se
  * 2010.
  *
@@ -31,7 +31,7 @@
 		add: function (handleObj) {
 			var handler, src;
 
-			if (this.nodeType === 1 && this.tagName.toLowerCase() === 'img' && this.src !== '') {
+			if (this.nodeName.toLowerCase() === 'img' && this.src) {
 
 				// Image is already complete, fire the handler (fixes browser issues were cached
 				// images isn't triggering the load event)
