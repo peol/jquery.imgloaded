@@ -12,8 +12,8 @@
  *   // Do stuff on load
  * });
  * 
- * Note that you can bind the 'error' event on data uri images, this will trigger when
- * data uri images isn't supported.
+ * Note that you can bind the 'error' event on data uri images, this will trigger
+ * when data uri images isn't supported.
  * 
  * Tested in:
  * FF 3+
@@ -21,21 +21,22 @@
  * Chromium 5-6
  * Opera 9-10
  */
-/*global jQuery*/
 (function ($) {
+
 	$.event.special.load = {
 		setup: function () {
 			// Attach to DOM
 			return false;
 		},
 		add: function (handleObj) {
-			var handler, src;
+			var img, handler, src;
 
 			if (this.nodeName.toLowerCase() === 'img' && this.src) {
+				img = this;
 
-				// Image is already complete, fire the handler (fixes browser issues were cached
-				// images isn't triggering the load event)
-				if (this.complete || this.readyState === 'complete') {
+				// Image is already complete, fire the handler (fixes browser issues were
+				// cached images isn't triggering the load event)
+				if (img.complete || img.readyState === 'complete') {
 
 					handler = handleObj.handler;
 
@@ -45,18 +46,20 @@
 					handleObj.handler = function () {
 
 						// only call handler if src has changed
-						if (src !== this.src) {
-							src = this.src;
-							return handler.apply(this, arguments);
+						if (src !== img.src) {
+							src = img.src;
+							return handler.apply(img, arguments);
 						}
 					};
 
-					handleObj.handler.call(this, $.Event(handleObj.type));
+					// delayed trigger; binding gets a chance to finish and the required
+					// jquery event object is passed to handler.
+					setTimeout(function () { $(img).trigger('load'); }, 0);
 				}
 
 				// Check if data URI images is supported, fire 'error' event if not
-				else if (this.readyState === 'uninitialized' && this.src.indexOf('data:') === 0) {
-					$(this).trigger('error');
+				else if (img.readyState === 'uninitialized' && img.src.indexOf('data:') === 0) {
+					$(img).trigger('error');
 				}
 			}
 		}
