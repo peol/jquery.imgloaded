@@ -29,10 +29,11 @@
 			return false;
 		},
 		add: function (handleObj) {
-			var img, handler, src;
+			var img, src, handler;
 
 			if (this.nodeName.toLowerCase() === 'img' && this.src) {
 				img = this;
+				src = img.src;
 
 				// Image is already complete, fire the handler (fixes browser issues were
 				// cached images isn't triggering the load event)
@@ -41,12 +42,16 @@
 					handler = handleObj.handler;
 
 					// this wrapper prevents the handler for being invoked twice if loading
-					// completed and an event got queued during this javascript exectution.
+					// completed and an event got queued during this javascript execution.
 					// The handler is only called again if img.src changes.
-					handleObj.handler = function () {
+					handleObj.handler = function (event) {
 
-						// only call handler if src has changed
-						if (src !== img.src) {
+						//trigger() event objects do not have browser properties
+						//(offsetX is chosen arbitrarily)
+						var browserEvent = 'offsetX' in event;
+
+						// only call handler if src has changed, or if trigger'ed
+						if (!browserEvent || src !== img.src) {
 							src = img.src;
 							return handler.apply(img, arguments);
 						}
