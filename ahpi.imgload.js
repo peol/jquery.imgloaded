@@ -48,10 +48,10 @@
 
 						//trigger() event objects do not have browser properties
 						//(offsetX is chosen arbitrarily)
-						var browserEvent = 'offsetX' in event;
+						var triggerEvent = !('offsetX' in event);
 
-						// only call handler if src has changed, or if trigger'ed
-						if (!browserEvent || src !== img.src) {
+						// only call handler if trigger'ed or if img.src has changed
+						if (triggerEvent || src !== img.src) {
 							src = img.src;
 							return handler.apply(img, arguments);
 						}
