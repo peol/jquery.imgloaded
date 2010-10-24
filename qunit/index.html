@@ -88,13 +88,13 @@ function runTests() {
 			if (0 === i) {
 				ok(true, i + ": Load event fired (cached.gif)");
 				ok(!('offsetX' in event), i + ": Triggered load event fired");
-				$cached[0].src = 'normal.gif';
 				i++;
+				$cached[0].src = 'normal.gif';
 			} else if (1 === i) {
 				ok(true, i + ": Load event fired (normal.gif)");
 				ok('offsetX' in event, i + ": Browser load event fired");
-				$cached[0].src = 'cached.gif';
 				i++;
+				$cached[0].src = 'cached.gif';
 			} else {
 				ok(true, i + ": Load event fired (cached.gif again)");
 				$cached.unbind('load');
