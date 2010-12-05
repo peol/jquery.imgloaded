@@ -31,7 +31,7 @@
 		add: function (handleObj) {
 			var img, src, handler;
 
-			if (this.nodeName.toLowerCase() === 'img' && this.src) {
+			if (this.nodeName && this.nodeName.toLowerCase() === 'img' && this.src) {
 				img = this;
 				src = img.src;
 
