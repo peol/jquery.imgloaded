@@ -23,18 +23,27 @@
  */
 (function ($, undefined) {
 	$.event.special.load = {
-		add: function () {
-			var el = this;
+		add: function (handleObj) {
+			var el = this, datasrc = 'load-datasrc', old_handler;
+
 			if ( el.nodeType === 1 && el.nodeName.toUpperCase() === 'IMG' && el.src !== '' ) {
 				// Image is already complete, fire the handler (fixes browser issues were cached
 				// images isn't triggering the load event)
 				if ( el.complete || el.complete === undefined ) {
+					old_handler = handleObj.handler;
+					handleObj.handler = function () {
+						if (!$.data(el, datasrc)) {
+							old_handler.apply(el, arguments);
+						}
+					};
 					// Let jQuery finish binding the event handler
 					setTimeout(function () {
 						var src = el.src;
+						$.data(el, datasrc, true);
 						// webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
 						// data uri bypasses webkit log warning (thx doug jones)
 						el.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+						$.removeData(el, datasrc);
 						el.src = src;
 					}, 0);
 				}
