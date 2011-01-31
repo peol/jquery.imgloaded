@@ -32,9 +32,11 @@
 				if ( el.complete || el.complete === undefined ) {
 					old_handler = handleObj.handler;
 					handleObj.handler = function () {
+						var ret;
 						if (!$.data(el, datasrc)) {
-							old_handler.apply(el, arguments);
+							ret = old_handler.apply(el, arguments);
 						}
+						return ret;
 					};
 					// Let jQuery finish binding the event handler
 					setTimeout(function () {
