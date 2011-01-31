@@ -24,28 +24,38 @@
 (function ($, undefined) {
 	$.event.special.load = {
 		add: function (handleObj) {
-			var el = this, datasrc = 'load-datasrc', old_handler;
+			var el = this, old_handler, noop, debounce, debounceSrc, debounceId;
 
 			if ( el.nodeType === 1 && el.nodeName.toUpperCase() === 'IMG' && el.src !== '' ) {
 				// Image is already complete, fire the handler (fixes browser issues were cached
 				// images isn't triggering the load event)
 				if ( el.complete || el.complete === undefined ) {
 					old_handler = handleObj.handler;
-					handleObj.handler = function () {
+					noop = function () {};
+					debounce = function () { // Firefox 3.5-3.6 fires load twice for data: URI, so debounce
 						var ret;
-						if (!$.data(el, datasrc)) {
+						if (el.src !== debounceSrc) {
+							debounceSrc = el.src;
 							ret = old_handler.apply(el, arguments);
+							clearTimeout(debounceId);
+							debounceId = setTimeout(function () {
+								handleObj.handler = old_handler;
+								noop = debounce = null;
+							}, 500);
 						}
 						return ret;
 					};
+					noop.guid = debounce.guid = old_handler.guid;
+
+					handleObj.handler = noop;
+
 					// Let jQuery finish binding the event handler
 					setTimeout(function () {
 						var src = el.src;
-						$.data(el, datasrc, true);
 						// webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
 						// data uri bypasses webkit log warning (thx doug jones)
 						el.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-						$.removeData(el, datasrc);
+						handleObj.handler = debounce;
 						el.src = src;
 					}, 0);
 				}
