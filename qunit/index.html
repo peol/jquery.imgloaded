@@ -77,11 +77,11 @@ $(window).load(function () {
 				count++;
 				log('second handler ' + this.src);
 			});
-		}, 2000);
+		}, 1000);
 		setTimeout(function () {
 			equal(count, 2, "Previous load event handler not called when new handler is bound");
 			start();
-		}, 4000);
+		}, 2000);
 
 		stop();
 	});
