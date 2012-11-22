@@ -1,6 +1,6 @@
 /*
  * Special event for image load events
- * Needed because some browsers does not trigger the event on cached images.
+ * Needed because some browsers does not trigger the event on already-loaded images.
 
  * MIT License
  * Paul Irish     | @paul_irish | www.paulirish.com
@@ -21,25 +21,37 @@
  * Chromium 5-6
  * Opera 9-10
  */
-(function ($) {
-	$.event.special.load = {
-		add: function (hollaback) {
-			if ( this.nodeType === 1 && this.tagName.toLowerCase() === 'img' && this.src !== '' ) {
-				// Image is already complete, fire the hollaback (fixes browser issues were cached
-				// images isn't triggering the load event)
-				if ( this.complete || this.readyState === 4 ) {
-					hollaback.handler.apply(this);
-				}
+(function ($, undefined) {
+	$.each({
+		load: function (el) { return el.complete || el.complete === undefined; },
+		error: function (el) { return el.readyState === 'uninitialized' && el.src.indexOf('data:') === 0; }
+	}, function (eventName, isReady) {
+		$.event.special[eventName] = {
+			add: function (handleObj) {
+				var el = this, flag = eventName + '-guid', old_handler = handleObj.handler;
 
-				// Check if data URI images is supported, fire 'error' event if not
-				else if ( this.readyState === 'uninitialized' && this.src.indexOf('data:') === 0 ) {
-					$(this).trigger('error');
-				}
-				
-				else {
-					$(this).bind('load', hollaback.handler);
+				if ( el.nodeType === 1 && el.nodeName.toUpperCase() === 'IMG' && el.src !== '' ) {
+					// Check if the image is already loaded or if data URI images are supported
+					// Trigger the event handler if necessary
+					if ( isReady(el) ) {
+						handleObj.handler = function () {
+							var guid = $.data(el, flag), ret;
+							if ( guid === old_handler.guid || guid === undefined ) {
+								ret = old_handler.apply(el, arguments);
+							}
+							return ret;
+						};
+
+						// Let jQuery finish binding the event handler
+						setTimeout(function () {
+							$(el)
+								.data(flag, old_handler.guid)
+								.trigger(eventName)
+								.removeData(flag);
+						}, 0);
+					}
 				}
 			}
-		}
-	};
+		};
+	});
 }(jQuery));

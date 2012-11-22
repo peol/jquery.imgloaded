@@ -10,47 +10,82 @@
 	<script src="../ahpi.imgload.js"></script>
 	<script src="qunit/qunit.js"></script>
 	<script>
-(function () {
+function log(msg) {
+	if (window.console && console.log) {
+		console.log(msg);
+	}
+}
 
-var img = new Image();
-img.onerror = img.onload = function () { runTests(); };
-img.src = 'cached.gif';
-
-function runTests() {
-
+$(window).load(function () {
 	test("Image load event (Normal)", function () {
 
-		expect(2);
+		expect(1);
 
-		var $normal = $('#normal');
-		$normal.bind('load', function () { ok(true, "Load event fired"); });
-		$normal.unbind('load');
-		ok(true, "Load event unbound");
+		$('#normal')
+			// NASA image URL from Dean Edwards (http://dean.edwards.name/my/busted.html)
+			.attr('src', 'http://www.nasa.gov/images/content/84857main_EC04-0325-23_lg.jpg?' + Math.random())
+			.bind('load', function () {
+				log('normal ' + this.src);
+				ok(true, "Load event fired");
+				start();
+			});
+		stop();
 	});
 
 	test("Image load event (Cached)", function () {
 
-		expect(2);
+		expect(1);
 
-		var $cached = $('#cached').attr('src', 'cached.gif');
-		$cached.bind('load', function () { ok(true, "Load event fired"); });
-		$cached.unbind('load');
-		ok(true, 'Load event unbound');
+		$('#cached')
+			.bind('load', function () {
+				log('cached ' + this.src);
+				ok(true, "Load event fired");
+				start();
+			});
+		stop();
 	});
 
 	test("Image load event (Data URI)", function () {
 
-		expect(2);
+		expect(1);
 
-		var $datauri = $('#datauri');
-		$datauri.bind('error', function () { ok(true, "Data URI not supported"); });
-		$datauri.bind('load', function () { ok(true, "Load event fired"); });
-		$datauri.unbind('load');
-		ok(true, 'Load event unbound');
+		$('#datauri')
+			.bind('error', function () {
+				log('data uri error ' + this.src);
+				ok(true, "Data URI not supported");
+				start();
+			})
+			.bind('load', function () {
+				log('data uri load ' + this.src);
+				ok(true, "Load event fired");
+				start();
+			});
+		stop();
 	});
-}
-}());
 
+	test("Multiple load event handlers", function () {
+		var count = 0;
+
+		expect(1);
+
+		$('#multiple').bind('load', function () {
+			count++;
+			log('first handler ' + this.src);
+		});
+		setTimeout(function () {
+			$('#multiple').bind('load', function () {
+				count++;
+				log('second handler ' + this.src);
+			});
+		}, 1000);
+		setTimeout(function () {
+			equal(count, 2, "Previous load event handler not called when new handler is bound");
+			start();
+		}, 2000);
+
+		stop();
+	});
+});
 	</script>
 
 </head>
@@ -58,9 +93,10 @@ function runTests() {
 <body>
 
 <p>
-	<img id="normal" src="normal.gif" />
-	<img id="cached" src="" />
+	<img id="normal" src="" height="240" width="300" />
+	<img id="cached" src="cached.gif" />
 	<img id="datauri" src="data:image/gif;base64,R0lGODdhGwAPAIAAAP///wAAACwAAAAAGwAPAAACN4SPqcvtD08IaIKJrclab+pdlDR+FViK50qq7Wu2XOjGJreEOmrDteqhCUed1E6R8RWTkaYzUgAAOw==" />
+	<img id="multiple" src="cached.gif" width="1" height="1" />
 	<a href="../ahpi.imgload.js">ahpi.imgload.js Source</a>
 </p>
 
