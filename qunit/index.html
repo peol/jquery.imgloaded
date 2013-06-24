@@ -17,40 +17,114 @@ img.onerror = img.onload = function () { runTests(); };
 img.src = 'cached.gif';
 
 function runTests() {
-
 	test("Image load event (Normal)", function () {
-
+		stop(1000);
 		expect(2);
 
 		var $normal = $('#normal');
-		$normal.bind('load', function () { ok(true, "Load event fired"); });
-		$normal.unbind('load');
-		ok(true, "Load event unbound");
+		$normal.bind('load', function (event) {
+			ok(true, "Load event fired");
+			$normal.unbind('load');
+			ok(!$normal.data('events'), 'Load event unbound');
+			start();
+		});
 	});
 
 	test("Image load event (Cached)", function () {
-
+		stop(1000);
 		expect(2);
 
 		var $cached = $('#cached').attr('src', 'cached.gif');
-		$cached.bind('load', function () { ok(true, "Load event fired"); });
-		$cached.unbind('load');
-		ok(true, 'Load event unbound');
+		$cached.bind('load', function (event) {
+			ok(!('offsetX' in event), "Load event fired");
+			$cached.unbind('load');
+			ok(!$cached.data('events'), 'Load event unbound');
+			start();
+		});
+	});
+
+	test("Bind with eventData (Cached)", function () {
+		stop(1000);
+		expect(3);
+
+		var $cached = $('#cached');
+		$cached.bind('load', {
+			eventdata: 7
+		}, function (event) {
+			ok(true, "Load event fired");
+			ok(event.data.eventdata === 7, "eventData is available");
+			$cached.unbind('load');
+			ok(!$cached.data('events'), 'Load event unbound');
+			start();
+		});
+	});
+
+	test("Triggered image load event (Cached)", function () {
+		stop(1000);
+		expect(3);
+
+		var $cached = $('#cached');
+		$cached.bind('load', function (event, triggered) {
+			if (!triggered) {
+				ok(true, "Load event fired");
+				$(this).trigger('load', [true]);
+			} else {
+				ok(true, "Triggerd load event fired");
+				$cached.unbind('load');
+				ok(!$cached.data('events'), 'Load event unbound');
+				start();
+			}
+		});
+	});
+
+	test("Image src change load event (Cached)", function () {
+		stop(1000);
+		expect(6);
+
+		var i = 0,
+			 $cached = $('#cached');
+		$cached.bind('load', function (event) {
+
+			if (0 === i) {
+				ok(true, i + ": Load event fired (cached.gif)");
+				ok(!('offsetX' in event), i + ": Triggered load event fired");
+				i++;
+				$cached[0].src = 'normal.gif';
+			} else if (1 === i) {
+				ok(true, i + ": Load event fired (normal.gif)");
+				ok('offsetX' in event, i + ": Browser load event fired");
+				i++;
+				$cached[0].src = 'cached.gif';
+			} else {
+				ok(true, i + ": Load event fired (cached.gif again)");
+				$cached.unbind('load');
+				ok(!$cached.data('events'), i + ': Load event unbound');
+				start();
+			}
+		});
 	});
 
 	test("Image load event (Data URI)", function () {
-
+		stop(1000);
 		expect(2);
 
 		var $datauri = $('#datauri');
-		$datauri.bind('error', function () { ok(true, "Data URI not supported"); });
-		$datauri.bind('load', function () { ok(true, "Load event fired"); });
-		$datauri.unbind('load');
-		ok(true, 'Load event unbound');
+		$datauri.bind('error', function () {
+			ok(true, "Data URI not supported");
+			$datauri.unbind('load error');
+			ok(!$datauri.data('events'), 'Load and error event unbound');
+			start();
+		});
+		$datauri.bind('load', function () {
+			ok(true, "Load event fired");
+			$datauri.unbind('load error');
+			ok(!$datauri.data('events'), 'Load and error event unbound');
+			start();
+		});
 	});
 }
-}());
 
+}());
 	</script>
 
 </head>
