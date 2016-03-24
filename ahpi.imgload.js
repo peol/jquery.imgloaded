@@ -25,7 +25,7 @@
 	$.event.special.load = {
 		add: function (hollaback) {
 			if ( this.nodeType === 1 && this.tagName.toLowerCase() === 'img' && this.src !== '' ) {
-				// Image is already complete, fire the hollaback (fixes browser issues were cached
+				// Image is already complete, fire the hollaback (fixes browser issues where cached
 				// images isn't triggering the load event)
 				if ( this.complete || this.readyState === 4 ) {
 					hollaback.handler.apply(this);
